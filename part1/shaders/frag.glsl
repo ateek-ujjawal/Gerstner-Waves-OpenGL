@@ -1,8 +1,10 @@
 #version 410
 
+uniform sampler2D tex;
+
 in PipelineData {
     vec3 v_vertexPosition;
-    vec3 v_vertexColors;
+    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } fs_in;
 
@@ -11,5 +13,6 @@ out vec4 color;
 // Entry point of program
 void main()
 {
-	color = vec4(fs_in.v_vertexColors.r,fs_in.v_vertexColors.g, fs_in.v_vertexColors.b, 1.0f);
+    vec3 diffuseColor =  texture(tex, fs_in.v_texCoords).rgb;
+	color = vec4(diffuseColor, 1.0f);
 }

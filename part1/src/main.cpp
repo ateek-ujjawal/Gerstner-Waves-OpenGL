@@ -18,6 +18,7 @@
 
 // Our libraries
 #include "Camera.hpp"
+#include "PPM.hpp"
 
 // vvvvvvvvvvvvvvvvvvvvvvvvvv Globals vvvvvvvvvvvvvvvvvvvvvvvvvv
 // Globals generally are prefixed with 'g' in this application.
@@ -47,6 +48,9 @@ GLuint gVertexArrayObjectFloor= 0;
 // Vertex Buffer Objects store information relating to vertices (e.g. positions, normals, textures)
 // VBOs are our mechanism for arranging geometry on the GPU.
 GLuint  gVertexBufferObjectFloor            = 0;
+
+// Water texture
+GLuint gTexId                    = 0;
 
 // Camera
 Camera gCamera;
@@ -303,112 +307,6 @@ struct Triangle{
     Vertex vertices[3]; // 3 vertices per triangle
 };
 
-
-
-// Return a value that is a mapping between the current range and a new range.
-// Source: https://www.arduino.cc/reference/en/language/functions/math/map/
-float map_linear(float x, float in_min, float in_max, float out_min, float out_max){
-    return (x-in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
-
-// Pass in an unsigned integer representing the number of
-// rows and columns in the plane (e.g. resolution=00)
-// The plane is 'flat' so the 'y' position will be 0.0f;
-std::vector<Triangle> generatePlane(size_t resolution=0){
-    
-    // Generate a grid of points
-    std::vector<Vertex> gridPoints;
-    for (int z = 0; z < gFloorResolution; z++) {
-        for (int x = 0; x < gFloorResolution; x++) {
-            Vertex point;
-
-            // Colors for the point
-            point.g = 6.0f;
-            point.r = point.b = 0.0f;
-
-            // Interpolated x and z values in the range -3.0f to 3.0f
-            point.x = map_linear(x, 0, gFloorResolution, -3.0f, 3.0f);
-            point.y = -1.0f;
-            point.z = -map_linear(z, 0, gFloorResolution, -3.0f, 3.0f);
-
-            // Surface normals for the point
-            point.nx = 0.0f;
-            point.ny = 1.0f;
-            point.nz = 0.0f;
-
-            // Push this point on the grid
-            gridPoints.push_back(point);
-        }
-    }
-
-    // Store the resulting plane 
-    std::vector<Triangle> result;
-    for (int z = 0; z < gFloorResolution - 1; z++) {
-        for (int x = 0; x < gFloorResolution - 1; x++) {
-
-            // Get vertex index of a quad consisting of four points
-            int idx1 = z * gFloorResolution + x;
-            int idx2 = idx1 + 1;
-            int idx3 = idx1 + gFloorResolution;
-            int idx4 = idx1 + gFloorResolution + 1;
-
-            // Make two triangles that represent a quad using upper
-            // and lower halves of it.
-            Triangle upperHalf, lowerHalf;
-
-            lowerHalf.vertices[0] = gridPoints[idx1];
-            lowerHalf.vertices[1] = gridPoints[idx2];
-            lowerHalf.vertices[2] = gridPoints[idx3];
-
-            upperHalf.vertices[0] = gridPoints[idx2];
-            upperHalf.vertices[1] = gridPoints[idx4];
-            upperHalf.vertices[2] = gridPoints[idx3];
-
-            // Push generated triangles to a vector
-            result.push_back(lowerHalf);
-            result.push_back(upperHalf);
-        }
-    }
-
-    return result;
-}
-
-
-
-
-// Regenerate the flat plane
-void GeneratePlaneBufferData(){
-    // Generate a plane with the resolution 
-    std::vector<Triangle> mesh = generatePlane(gFloorResolution); 
-
-		std::vector<GLfloat> vertexDataFloor;
-        for (Triangle t : mesh) {
-            for (Vertex v : t.vertices) {
-                vertexDataFloor.push_back(v.x);
-                vertexDataFloor.push_back(v.y);
-                vertexDataFloor.push_back(v.z);
-                vertexDataFloor.push_back(v.r);
-                vertexDataFloor.push_back(v.g);
-                vertexDataFloor.push_back(v.b);
-                vertexDataFloor.push_back(v.nx);
-                vertexDataFloor.push_back(v.ny);
-                vertexDataFloor.push_back(v.nz);
-            }
-        }
-
-		// Store size in a global so you can later determine how many
-		// vertices to draw in glDrawArrays;
-		// TODO: You need to verify to yourself if this 'size' represents the number of 'vertices' or not -- think about it.
-    gFloorTriangles = vertexDataFloor.size();
-
-		glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObjectFloor);
-		glBufferData(GL_ARRAY_BUFFER, 						// Kind of buffer we are working with 
-																							// (e.g. GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER)
-							 vertexDataFloor.size() * sizeof(GL_FLOAT), 	// Size of data in bytes
-							 vertexDataFloor.data(), 											// Raw array of data
-							 GL_STATIC_DRAW);															// How we intend to use the data
-}
-
 /**
 * Setup your geometry during the vertex specification step
 *
@@ -432,18 +330,18 @@ void VertexSpecification(){
     //GeneratePlaneBufferData();
     std::vector<GLfloat> vertexDataQuad
     {
-        -1.0, 0.0, -1.0,     // Bottom-left vertex of quad
-        0.0, 0.0, 1.0,       // color
-        0.0, 1.0, 0.0,       // normal
-        1.0, 0.0, -1.0,      // Bottom-right vertex
-        0.0, 0.0, 1.0,       // color
-        0.0, 1.0, 0.0,       // normal
-        1.0, 0.0, 1.0,       // Top-right vertex
-        0.0, 0.0, 1.0,       // color
-        0.0, 1.0, 0.0,        // normal
-        -1.0, 0.0, 1.0,      // Top-left vertex
-        0.0, 0.0, 1.0,        // color
-        0.0, 1.0, 0.0        // normal
+        -10.0, 0.0, -10.0,     // Bottom-left vertex of quad
+        -1.0, -1.0,            // texture
+        0.0, 1.0, 0.0,         // normal
+        10.0, 0.0, -10.0,      // Bottom-right vertex
+        1.0, -1.0,             // texture
+        0.0, 1.0, 0.0,         // normal
+        10.0, 0.0, 10.0,       // Top-right vertex
+        1.0, 1.0,              // texture
+        0.0, 1.0, 0.0,         // normal
+        -10.0, 0.0, 10.0,      // Top-left vertex
+        -1.0, 1.0,             // texture
+        0.0, 1.0, 0.0          // normal
     };
 
     gFloorTriangles = vertexDataQuad.size();
@@ -459,20 +357,20 @@ void VertexSpecification(){
     // offsets every 3 floats
     // v     v     v
     // 
-    // x,y,z,r,g,b,nx,ny,nz
+    // x,y,z,s,t,nx,ny,nz
     //
-    // |------------------| strides is '9' floats
+    // |------------------| strides is '8' floats
     //
     // ============================
     // Position information (x,y,z)
 	glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*9,(void*)0);
-    // Color information (r,g,b)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*8,(GLvoid*)0);
+    // Color information (s,t)
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*9,(GLvoid*)(sizeof(GL_FLOAT)*3));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*8,(GLvoid*)(sizeof(GL_FLOAT)*3));
     // Normal information (nx,ny,nz)
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*9, (GLvoid*)(sizeof(GL_FLOAT)*6));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*8, (GLvoid*)(sizeof(GL_FLOAT)*5));
 
 	// Unbind our currently bound Vertex Array Object
 	glBindVertexArray(0);
@@ -481,8 +379,40 @@ void VertexSpecification(){
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
-}
 
+    // Texture data setup
+    // Generate Texture object
+    glGenTextures(1, &gTexId);
+    // Bind it to GL_TEXTURE_2D
+    glBindTexture(GL_TEXTURE_2D, gTexId);
+    // Populate Texture data
+    std::string fileName = "./water.ppm";
+    //int found = fileName.find_last_of("/");
+    //std::string directory = fileName.substr(0, found);
+    PPM texturePPM = PPM(fileName);
+    texturePPM.flipPPM();
+    std::vector<uint8_t> texturePixelData = texturePPM.pixelData();
+    int height = texturePPM.getHeight();
+    int width = texturePPM.getWidth();
+    glTexImage2D(
+        GL_TEXTURE_2D,          // 2D Texture
+        0,                      // Mipmap level 0(highest resolution)
+        GL_RGB,                 // Internal format
+        width,                  // Image width
+        height,                 // Image height
+        0,                      // Border(must be 0)
+        GL_RGB,                 // Image format
+        GL_UNSIGNED_BYTE,       // Data type of each pixel
+        texturePixelData.data() // Raw texture pixel data
+    );
+    // Generate mipmaps for our texture
+    glGenerateMipmap(GL_TEXTURE_2D);
+    // Parameters for minification, magnification, wrap on s and t using bilinear filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+}
 
 /**
 * PreDraw
@@ -540,7 +470,7 @@ void PreDraw(){
     glm::mat4 perspective = glm::perspective(glm::radians(45.0f),
                                              (float)gScreenWidth/(float)gScreenHeight,
                                              0.1f,
-                                             20.0f);
+                                             100.0f);
 
     // Retrieve our location of our perspective matrix uniform 
     GLint u_ProjectionLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"u_Projection");
@@ -548,6 +478,71 @@ void PreDraw(){
         glUniformMatrix4fv(u_ProjectionLocation,1,GL_FALSE,&perspective[0][0]);
     }else{
         std::cout << "Could not find u_Perspective, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    // Retrieve our location of our texture sampler uniform 
+    GLint u_TextureSamplerLocation = glGetUniformLocation( gGraphicsPipelineShaderProgram,"tex");
+    if(u_TextureSamplerLocation>=0){
+        glUniform1i(u_TextureSamplerLocation,0);
+    }else{
+        std::cout << "Could not find tex, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWavesLengthLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves_length");
+    if(u_GerstnerWavesLengthLocation>=0){
+        glUniform1ui(u_GerstnerWavesLengthLocation,1);
+    }else{
+        std::cout << "Could not find gerstner_waves_length, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveTimeLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"time");
+    if(u_GerstnerWaveTimeLocation>=0){
+        glUniform1f(u_GerstnerWaveTimeLocation,static_cast<float>(SDL_GetTicks()) / 1000.0f);
+    }else{
+        std::cout << "Could not find time, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveDirectionLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[0].direction");
+    if(u_GerstnerWaveDirectionLocation>=0){
+        glUniform2f(u_GerstnerWaveDirectionLocation,glm::sin(0.32f), glm::cos(0.32f));
+    }else{
+        std::cout << "Could not find gerstner_waves[0].direction, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveAmplitudeLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[0].amplitude");
+    if(u_GerstnerWaveAmplitudeLocation>=0){
+        glUniform1f(u_GerstnerWaveAmplitudeLocation,0.64f);
+    }else{
+        std::cout << "Could not find gerstner_waves[0].amplitude, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveSteepnessLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[0].steepness");
+    if(u_GerstnerWaveSteepnessLocation>=0){
+        glUniform1f(u_GerstnerWaveSteepnessLocation,0.64f);
+    }else{
+        std::cout << "Could not find gerstner_waves[0].steepness, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveFrequencyLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[0].frequency");
+    if(u_GerstnerWaveFrequencyLocation>=0){
+        glUniform1f(u_GerstnerWaveFrequencyLocation,0.64f);
+    }else{
+        std::cout << "Could not find gerstner_waves[0].frequency, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveSpeedLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[0].speed");
+    if(u_GerstnerWaveSpeedLocation>=0){
+        glUniform1f(u_GerstnerWaveSpeedLocation,1.28f);
+    }else{
+        std::cout << "Could not find gerstner_waves[0].speed, maybe a mispelling?\n";
         exit(EXIT_FAILURE);
     }
 }
@@ -564,6 +559,10 @@ void PreDraw(){
 void Draw(){
     // Enable our attributes
 	glBindVertexArray(gVertexArrayObjectFloor);
+
+    // Set texture data
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gTexId);
 
     //Render data
     glDrawArrays(GL_PATCHES,0,gFloorTriangles);
