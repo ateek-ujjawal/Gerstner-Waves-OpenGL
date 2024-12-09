@@ -25,9 +25,9 @@ void Camera::MouseLook(int mouseX, int mouseY){
     // Convert delta to a radian angle
     // Then rotate about the up vector
     glm::mat4 rotationModelX = glm::rotate(glm::mat4(1.0f), glm::radians(delta.x), m_upVector);
-    glm::mat4 rotationModelY = glm::rotate(rotationModelX, glm::radians(delta.y), glm::vec3(1.0f, 0.0f, 0.0f));
+    //glm::mat4 rotationModelY = glm::rotate(rotationModelX, glm::radians(delta.y), glm::vec3(1.0f, 0.0f, 0.0f));
     glm::vec4 vec4View = glm::vec4(m_viewDirection.x, m_viewDirection.y, m_viewDirection.z, 1.0f);
-    vec4View = rotationModelY * vec4View;
+    vec4View = rotationModelX * vec4View;
     m_viewDirection = glm::vec3(vec4View.x, vec4View.y, vec4View.z);
 
     // Update our old position after we have made changes 
@@ -105,7 +105,7 @@ float Camera::GetViewZDirection(){
 Camera::Camera(){
     std::cout << "Camera.cpp: (Constructor) Created a Camera!\n";
 	// Position us at the origin.
-    m_eyePosition = glm::vec3(0.0f,2.0f, 3.0f);
+    m_eyePosition = glm::vec3(0.0f,40.0f, 3.0f);
 	// Looking down along the z-axis initially.
 	// Remember, this is negative because we are looking 'into' the scene.
     m_viewDirection = glm::vec3(0.0f,0.0f, -1.0f);
