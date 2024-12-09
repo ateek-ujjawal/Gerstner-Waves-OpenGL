@@ -554,12 +554,12 @@ void VertexSpecification(){
 
     std::vector<std::string> faces
     {
-        "./right.ppm",
-        "./left.ppm",
-        "./top.ppm",
-        "./bottom.ppm",
-        "./front.ppm",
-        "./back.ppm"
+        "./skybox_media/right.ppm",
+        "./skybox_media/left.ppm",
+        "./skybox_media/top.ppm",
+        "./skybox_media/bottom.ppm",
+        "./skybox_media/front.ppm",
+        "./skybox_media/back.ppm"
     };
     loadCubemap(faces);  
 }
