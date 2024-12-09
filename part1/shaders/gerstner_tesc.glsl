@@ -1,21 +1,19 @@
 #version 410
 
-// Tessellation control shader: we decide how much we should tessellate a quad geometry.
-// All tessellation in OpenGL is done according to an "abstract patch", which is a quad,
-// in this case. The outer tessellation level decides how many edges to spawn in each of
-// the edges of the quad, and the inner tessellation level say how many inner primitives
-// to spawn (in this case, quads). These settings are passed over to the primitive tess.
-// unit that will generate more geometry for us.
+// Tessellation control shader
+// Generate tessellated geometry using the 4 control points provided for a quad from the
+// vertex shader. These control points are then passed onto a primitive generator which
+// generates more geometry based on the inner and outer tessellation levels provided.
 
 layout(vertices = 4) out;
 
-in PipelineData {
+in VertexData {
     vec3 v_vertexPosition;
     vec2 v_texCoords;
     vec3 v_vertexNormals;
 } tc_in[];
 
-out PipelineData {
+out VertexData {
     vec3 v_vertexPosition;
     vec2 v_texCoords;
     vec3 v_vertexNormals;
@@ -29,6 +27,8 @@ void main() {
 
     float tess_level = 100.0;
 
+    // Define inner and outer tessellation levels
+    // For quads it has 2 inner levels and 4 outer levels
     gl_TessLevelInner[0] = tess_level;
     gl_TessLevelInner[1] = tess_level;
     gl_TessLevelOuter[0] = tess_level; 

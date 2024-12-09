@@ -10,7 +10,7 @@ layout(location=2) in vec3 vertexNormals;
 // Uniform variables
 uniform mat4 u_ModelMatrix;
 
-out PipelineData {
+out VertexData {
     vec3 v_vertexPosition;
     vec2 v_texCoords;
     vec3 v_vertexNormals;

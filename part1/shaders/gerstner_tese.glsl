@@ -1,24 +1,25 @@
 #version 410
 
-// Tessellation evaluation shader: after tessellation has been done, new vertices have
-// been generated. We now decide where to place these vertices. The vertices are interpolated
-// bilinearly and then we apply a gerstner wave function to displace these vertices using an
-// initial x-z position value. The displaced vertex is then transformed using the projection and
-// view matrix here
+// Tessellation evaluation shader
+// After tessellation control shader is done and then passed new vertices onto the TES,
+// we displace the vertices by the gerstner wave function(also including the normals).
+// I also bilinearly interpolated the position, normals and texture coordinates according to the
+// weights given by gl_TessCoord, which is the tessellated coordinate.
 
+// We use quads with a fractional even spacing tessellation to smoothen the edges
 layout(quads, fractional_even_spacing) in;
 
 uniform mat4 u_ViewMatrix;
 uniform mat4 u_Projection; // We'll use a perspective projection
 uniform mat4 u_ModelMatrix;
 
-in PipelineData {
+in VertexData {
     vec3 v_vertexPosition;
     vec2 v_texCoords;
     vec3 v_vertexNormals;
 } te_in[];
 
-out PipelineData {
+out VertexData {
     vec3 v_vertexPosition;
     vec2 v_texCoords;
     vec3 v_vertexNormals;
@@ -32,7 +33,7 @@ uniform struct GerstnerWave {
     float steepness;
     float frequency;
     float speed;
-} gerstner_waves[9];
+} gerstner_waves[5];
 
 vec3 gerstner_wave_normal(vec3 position, float time) {
     vec3 wave_normal = vec3(0.0, 1.0, 0.0);
@@ -101,11 +102,6 @@ void main() {
     // Displace the tessellated geometry in the direction of the normal by us-
     // ing a sum of Gerstner waves.
     te_out.v_vertexPosition = gerstner_wave(te_out.v_vertexPosition.xz, time,  te_out.v_vertexNormals);
-
-    // For reflection property
-    //te_out.v_vertexNormals = mat3(transpose(inverse(u_ModelMatrix))) * te_out.v_vertexNormals;
-    //te_out.v_vertexPosition = vec3(u_ModelMatrix * vec4(te_out.v_vertexPosition, 1.0));
-
     vec4 world_position = vec4(te_out.v_vertexPosition, 1);
 
     gl_Position = u_Projection * u_ViewMatrix * world_position;
