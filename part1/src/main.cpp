@@ -64,7 +64,7 @@ Camera gCamera;
 size_t gFloorTriangles  = 0;
 
 // Quad size
-float gOceanSize = 800.0f;
+float gOceanSize = 1500.0f;
 int num_of_waves = 1;
 
 // Polygon Mode
@@ -452,36 +452,36 @@ void VertexSpecification(){
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 
-    // Texture data setup
-    // Generate Texture object
-    glGenTextures(1, &gTexId);
-    // Bind it to GL_TEXTURE_2D
-    glBindTexture(GL_TEXTURE_2D, gTexId);
-    // Populate Texture data
-    std::string fileName = "./water.ppm";
-    PPM texturePPM = PPM(fileName);
-    //texturePPM.flipPPM();
-    std::vector<uint8_t> texturePixelData = texturePPM.pixelData();
-    int height = texturePPM.getHeight();
-    int width = texturePPM.getWidth();
-    glTexImage2D(
-        GL_TEXTURE_2D,          // 2D Texture
-        0,                      // Mipmap level 0(highest resolution)
-        GL_RGB,                 // Internal format
-        width,                  // Image width
-        height,                 // Image height
-        0,                      // Border(must be 0)
-        GL_RGB,                 // Image format
-        GL_UNSIGNED_BYTE,       // Data type of each pixel
-        texturePixelData.data() // Raw texture pixel data
-    );
-    // Generate mipmaps for our texture
-    glGenerateMipmap(GL_TEXTURE_2D);
-    // Parameters for minification, magnification, wrap on s and t using bilinear filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // // Texture data setup
+    // // Generate Texture object
+    // glGenTextures(1, &gTexId);
+    // // Bind it to GL_TEXTURE_2D
+    // glBindTexture(GL_TEXTURE_2D, gTexId);
+    // // Populate Texture data
+    // std::string fileName = "./water.ppm";
+    // PPM texturePPM = PPM(fileName);
+    // //texturePPM.flipPPM();
+    // std::vector<uint8_t> texturePixelData = texturePPM.pixelData();
+    // int height = texturePPM.getHeight();
+    // int width = texturePPM.getWidth();
+    // glTexImage2D(
+    //     GL_TEXTURE_2D,          // 2D Texture
+    //     0,                      // Mipmap level 0(highest resolution)
+    //     GL_RGB,                 // Internal format
+    //     width,                  // Image width
+    //     height,                 // Image height
+    //     0,                      // Border(must be 0)
+    //     GL_RGB,                 // Image format
+    //     GL_UNSIGNED_BYTE,       // Data type of each pixel
+    //     texturePixelData.data() // Raw texture pixel data
+    // );
+    // // Generate mipmaps for our texture
+    // glGenerateMipmap(GL_TEXTURE_2D);
+    // // Parameters for minification, magnification, wrap on s and t using bilinear filtering
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     glGenVertexArrays(1, &gVertexArrayObjectSkybox);
 	// We bind (i.e. select) to the Vertex Array Object (VAO) that we want to work withn.
@@ -618,31 +618,52 @@ void PreDraw(){
     glm::mat4 perspective = glm::perspective(glm::radians(45.0f),
                                              (float)gScreenWidth/(float)gScreenHeight,
                                              0.1f,
-                                             1000.0f);
+                                             2000.0f);
 
     // Retrieve our location of our perspective matrix uniform 
     GLint u_ProjectionLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"u_Projection");
     if(u_ProjectionLocation>=0){
         glUniformMatrix4fv(u_ProjectionLocation,1,GL_FALSE,&perspective[0][0]);
     }else{
-        std::cout << "Could not find u_Perspective, maybe a mispelling?\n";
+        std::cout << "Could not find u_Projection, maybe a mispelling?\n";
         exit(EXIT_FAILURE);
     }
 
     // Retrieve our location of our texture sampler uniform 
-    GLint u_TextureSamplerLocation = glGetUniformLocation( gGraphicsPipelineShaderProgram,"tex");
-    if(u_TextureSamplerLocation>=0){
-        glUniform1i(u_TextureSamplerLocation,0);
+    // GLint u_TextureSamplerLocation = glGetUniformLocation( gGraphicsPipelineShaderProgram,"tex");
+    // if(u_TextureSamplerLocation>=0){
+    //     glUniform1i(u_TextureSamplerLocation,0);
+    // }else{
+    //     std::cout << "Could not find tex, maybe a mispelling?\n";
+    //     exit(EXIT_FAILURE);
+    // }
+
+    GLint u_SkyTextureSamplerLocation = glGetUniformLocation( gGraphicsPipelineShaderProgram,"skybox");
+    if(u_SkyTextureSamplerLocation>=0){
+        glUniform1i(u_SkyTextureSamplerLocation,0);
     }else{
-        std::cout << "Could not find tex, maybe a mispelling?\n";
+        std::cout << "Could not find skybox, maybe a mispelling?\n";
         exit(EXIT_FAILURE);
     }
 
-    GLint u_GerstnerWavesLengthLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves_length");
+    glm::vec3 cameraPos = glm::vec3(gCamera.GetEyeXPosition() + gCamera.GetViewXDirection(),
+                                  gCamera.GetEyeYPosition() + gCamera.GetViewYDirection(),
+                                  gCamera.GetEyeZPosition() + gCamera.GetViewZDirection());
+
+    GLint u_ViewPosition = glGetUniformLocation(gGraphicsPipelineShaderProgram,"cameraPos");
+    if(u_ViewPosition >=0){
+        glUniform3fv(u_ViewPosition,1,&cameraPos[0]);
+    }else{
+        std::cout << "Could not find cameraPos, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    } 
+    
+
+    GLint u_GerstnerWavesLengthLocation= glGetUniformLocation( gGraphicsPipelineShaderProgram,"num_of_waves");
     if(u_GerstnerWavesLengthLocation>=0){
         glUniform1ui(u_GerstnerWavesLengthLocation,num_of_waves);
     }else{
-        std::cout << "Could not find gerstner_waves_length, maybe a mispelling?\n";
+        std::cout << "Could not find num_of_waves, maybe a mispelling?\n";
         exit(EXIT_FAILURE);
     }
 
@@ -777,6 +798,47 @@ void PreDraw(){
         exit(EXIT_FAILURE);
     }
 
+    // Wave 3 -----------------------------------
+    GLint u_GerstnerWaveDirectionLocation3= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[3].direction");
+    if(u_GerstnerWaveDirectionLocation3>=0){
+        glUniform2f(u_GerstnerWaveDirectionLocation3,glm::sin(0.5f), glm::cos(0.5f));
+    }else{
+        std::cout << "Could not find gerstner_waves[3].direction, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveAmplitudeLocation3= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[3].amplitude");
+    if(u_GerstnerWaveAmplitudeLocation3>=0){
+        glUniform1f(u_GerstnerWaveAmplitudeLocation3,6.0f);
+    }else{
+        std::cout << "Could not find gerstner_waves[3].amplitude, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveSteepnessLocation3= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[3].steepness");
+    if(u_GerstnerWaveSteepnessLocation3>=0){
+        glUniform1f(u_GerstnerWaveSteepnessLocation3,2.5f);
+    }else{
+        std::cout << "Could not find gerstner_waves[3].steepness, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveFrequencyLocation3= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[3].frequency");
+    if(u_GerstnerWaveFrequencyLocation3>=0){
+        glUniform1f(u_GerstnerWaveFrequencyLocation3,2.0f);
+    }else{
+        std::cout << "Could not find gerstner_waves[3].frequency, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
+    GLint u_GerstnerWaveSpeedLocation3= glGetUniformLocation( gGraphicsPipelineShaderProgram,"gerstner_waves[3].speed");
+    if(u_GerstnerWaveSpeedLocation3>=0){
+        glUniform1f(u_GerstnerWaveSpeedLocation3,1.0f);
+    }else{
+        std::cout << "Could not find gerstner_waves[3].speed, maybe a mispelling?\n";
+        exit(EXIT_FAILURE);
+    }
+
     glUseProgram(gSkyboxPipelineShaderProgram);
 
     // Update the View Matrix
@@ -823,8 +885,12 @@ void Draw(){
 	glBindVertexArray(gVertexArrayObjectFloor);
 
     // Set texture data
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, gTexId);
+
+    // Set skybox texture map
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gTexId);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, gCubeTexId);
 
     //Render data
     glDrawArrays(GL_PATCHES,0,gFloorTriangles);
@@ -926,6 +992,9 @@ void Input(){
     }
     if (state[SDL_SCANCODE_3]) {
         num_of_waves = 3;
+    }
+    if (state[SDL_SCANCODE_4]) {
+        num_of_waves = 4;
     }
 
     if (state[SDL_SCANCODE_TAB]) {

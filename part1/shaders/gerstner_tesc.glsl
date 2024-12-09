@@ -5,8 +5,7 @@
 // in this case. The outer tessellation level decides how many edges to spawn in each of
 // the edges of the quad, and the inner tessellation level say how many inner primitives
 // to spawn (in this case, quads). These settings are passed over to the primitive tess.
-// unit that will generate more geometry for us. In the case of our shader, tessellation
-// level varies inversely proportional to the distance of the chosen vertex and the eye.
+// unit that will generate more geometry for us.
 
 layout(vertices = 4) out;
 
