@@ -1124,6 +1124,9 @@ void CleanUp(){
 int main( int argc, char* args[] ){
     std::cout << "Use w and s keys to move forward and back\n";
     std::cout << "Use tab to toggle wireframe\n";
+    std::cout << "Use mouse to rotate left or right\n";
+    std::cout << "Press numbers 1-4 to control the number of gerstner waves\n";
+    std::cout << "Press left or right to cycle through various different environments\n";
     std::cout << "Press ESC to quit\n";
 
 	// 1. Setup the graphics program
