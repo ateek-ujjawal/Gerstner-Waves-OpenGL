@@ -6,7 +6,6 @@ uniform vec3 cameraPos;
 
 in VertexData {
     vec3 v_vertexPosition;
-    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } fs_in;
 

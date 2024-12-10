@@ -9,20 +9,17 @@ layout(vertices = 4) out;
 
 in VertexData {
     vec3 v_vertexPosition;
-    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } tc_in[];
 
 out VertexData {
     vec3 v_vertexPosition;
-    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } tc_out[];
 
 void main() {
     // Just forward the vertex attributes through the GL pipeline.
     tc_out[gl_InvocationID].v_vertexPosition = tc_in[gl_InvocationID].v_vertexPosition;
-    tc_out[gl_InvocationID].v_texCoords = tc_in[gl_InvocationID].v_texCoords;
     tc_out[gl_InvocationID].v_vertexNormals = tc_in[gl_InvocationID].v_vertexNormals;
 
     float tess_level = 100.0;

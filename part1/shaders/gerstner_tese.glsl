@@ -15,13 +15,11 @@ uniform mat4 u_ModelMatrix;
 
 in VertexData {
     vec3 v_vertexPosition;
-    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } te_in[];
 
 out VertexData {
     vec3 v_vertexPosition;
-    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } te_out;
 
@@ -82,18 +80,14 @@ vec3 gerstner_wave_position(vec2 position, float time) {
 vec3 gerstner_wave(vec2 position, float time, inout vec3 normal) {
     vec3 wave_position = gerstner_wave_position(position, time);
     normal = gerstner_wave_normal(wave_position, time);
-    return wave_position; // Accumulated Gerstner Wave.
+    return wave_position;
 }
 
 void main() {
-    // Interpolate positions, normals and texture coordinates using gl_TessCoord as the weights
+    // Interpolate positions, normals using gl_TessCoord as the weights
     vec3 x_up_position_mix = mix(te_in[0].v_vertexPosition, te_in[3].v_vertexPosition, gl_TessCoord.x);
     vec3 x_down_position_mix = mix(te_in[1].v_vertexPosition, te_in[2].v_vertexPosition, gl_TessCoord.x);
     te_out.v_vertexPosition = mix(x_down_position_mix, x_up_position_mix, gl_TessCoord.y);
-
-    vec2 x_up_texture_mix = mix(te_in[0].v_texCoords, te_in[3].v_texCoords, gl_TessCoord.x);
-    vec2 x_down_texture_mix = mix(te_in[1].v_texCoords, te_in[2].v_texCoords, gl_TessCoord.x);
-    te_out.v_texCoords = mix(x_down_texture_mix, x_up_texture_mix, gl_TessCoord.y);
 
     vec3 x_up_normal_mix = mix(te_in[0].v_vertexNormals, te_in[3].v_vertexNormals, gl_TessCoord.x);
     vec3 x_down_normal_mix = mix(te_in[1].v_vertexNormals, te_in[2].v_vertexNormals, gl_TessCoord.x);

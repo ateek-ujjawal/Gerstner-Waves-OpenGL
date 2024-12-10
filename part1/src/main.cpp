@@ -24,8 +24,8 @@
 // Globals generally are prefixed with 'g' in this application.
 
 // Screen Dimensions
-int gScreenWidth 						= 1920;
-int gScreenHeight 						= 1080;
+int gScreenWidth 						= 640;
+int gScreenHeight 						= 480;
 SDL_Window* gGraphicsApplicationWindow 	= nullptr;
 SDL_GLContext gOpenGLContext			= nullptr;
 
@@ -65,7 +65,12 @@ size_t gFloorTriangles  = 0;
 
 // Quad size
 float gOceanSize = 1500.0f;
+// Number of gerstner waves
 int num_of_waves = 1;
+
+// Chosen environment
+int chosenEnvironment = 0;
+std::vector<std::vector<std::string>> cubemapFaces;
 
 // Polygon Mode
 GLenum gPolygonMode = GL_FILL;
@@ -320,12 +325,12 @@ void InitializeProgram(){
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 	// Create an application window using OpenGL that supports SDL
-	gGraphicsApplicationWindow = SDL_CreateWindow( "Tesselation",
-													SDL_WINDOWPOS_UNDEFINED,
-													SDL_WINDOWPOS_UNDEFINED,
+	gGraphicsApplicationWindow = SDL_CreateWindow( "Wave simulation",
+													SDL_WINDOWPOS_CENTERED,
+													SDL_WINDOWPOS_CENTERED,
 													gScreenWidth,
 													gScreenHeight,
-													SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN );
+													SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE );
 
 	// Check if Window did not create.
 	if( gGraphicsApplicationWindow == nullptr ){
@@ -403,16 +408,12 @@ void VertexSpecification(){
     std::vector<GLfloat> vertexDataQuad
     {
         -gOceanSize, 0.0, -gOceanSize,     // Bottom-left vertex of quad
-        -1.0, -1.0,            // texture
         0.0, 1.0, 0.0,         // normal
         gOceanSize, 0.0, -gOceanSize,      // Bottom-right vertex
-        1.0, -1.0,             // texture
         0.0, 1.0, 0.0,         // normal
         gOceanSize, 0.0, gOceanSize,       // Top-right vertex
-        1.0, 1.0,              // texture
         0.0, 1.0, 0.0,         // normal
         -gOceanSize, 0.0, gOceanSize,      // Top-left vertex
-        -1.0, 1.0,             // texture
         0.0, 1.0, 0.0          // normal
     };
 
@@ -427,22 +428,19 @@ void VertexSpecification(){
  
     // =============================
     // offsets every 3 floats
-    // v     v     v
+    // v     v
     // 
-    // x,y,z,s,t,nx,ny,nz
+    // x,y,z,nx,ny,nz
     //
-    // |------------------| strides is '8' floats
+    // |------------------| strides is '6' floats
     //
     // ============================
     // Position information (x,y,z)
 	glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*8,(GLvoid*)0);
-    // Color information (s,t)
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*8,(GLvoid*)(sizeof(GL_FLOAT)*3));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*6,(GLvoid*)0);
     // Normal information (nx,ny,nz)
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*8, (GLvoid*)(sizeof(GL_FLOAT)*5));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,sizeof(GL_FLOAT)*6, (GLvoid*)(sizeof(GL_FLOAT)*3));
 
 	// Unbind our currently bound Vertex Array Object
 	glBindVertexArray(0);
@@ -450,7 +448,6 @@ void VertexSpecification(){
 	// as we do not want to leave them open. 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(2);
 
     // // Texture data setup
     // // Generate Texture object
@@ -552,16 +549,42 @@ void VertexSpecification(){
 	// as we do not want to leave them open. 
 	glDisableVertexAttribArray(0);
 
-    std::vector<std::string> faces
+    cubemapFaces =
     {
-        "./skybox_media/right.ppm",
-        "./skybox_media/left.ppm",
-        "./skybox_media/top.ppm",
-        "./skybox_media/bottom.ppm",
-        "./skybox_media/front.ppm",
-        "./skybox_media/back.ppm"
+        {
+            "./skybox_media/sky_right.ppm",
+            "./skybox_media/sky_left.ppm",
+            "./skybox_media/sky_top.ppm",
+            "./skybox_media/sky_bottom.ppm",
+            "./skybox_media/sky_front.ppm",
+            "./skybox_media/sky_back.ppm"
+        },
+        {
+            "./skybox_media/space_right.ppm",
+            "./skybox_media/space_left.ppm",
+            "./skybox_media/space_top.ppm",
+            "./skybox_media/space_bottom.ppm",
+            "./skybox_media/space_front.ppm",
+            "./skybox_media/space_back.ppm"
+        },
+        {
+            "./skybox_media/forest_right.ppm",
+            "./skybox_media/forest_left.ppm",
+            "./skybox_media/forest_top.ppm",
+            "./skybox_media/forest_bottom.ppm",
+            "./skybox_media/forest_front.ppm",
+            "./skybox_media/forest_back.ppm"
+        },
+        {
+            "./skybox_media/canyon_right.ppm",
+            "./skybox_media/canyon_left.ppm",
+            "./skybox_media/canyon_top.ppm",
+            "./skybox_media/canyon_bottom.ppm",
+            "./skybox_media/canyon_front.ppm",
+            "./skybox_media/canyon_back.ppm"
+        }
     };
-    loadCubemap(faces);  
+    loadCubemap(cubemapFaces[chosenEnvironment]);  
 }
 
 /**
@@ -955,6 +978,12 @@ void Input(){
             mouseY+=e.motion.yrel;
             gCamera.MouseLook(mouseX,mouseY);
         }
+        if (e.type == SDL_WINDOWEVENT) {
+            if (e.window.event == SDL_WINDOWEVENT_RESIZED) {
+                gScreenWidth = e.window.data1;
+                gScreenHeight = e.window.data2;
+            }
+        }
 	}
 
     // Retrieve keyboard state
@@ -996,6 +1025,18 @@ void Input(){
     if (state[SDL_SCANCODE_4]) {
         num_of_waves = 4;
     }
+    if (state[SDL_SCANCODE_RIGHT]) {
+        chosenEnvironment++;
+        if (chosenEnvironment > cubemapFaces.size() - 1)
+            chosenEnvironment = 0;
+        loadCubemap(cubemapFaces[chosenEnvironment]);
+    }
+    if (state[SDL_SCANCODE_LEFT]) {
+        chosenEnvironment--;
+        if (chosenEnvironment < 0)
+            chosenEnvironment = cubemapFaces.size() - 1;
+        loadCubemap(cubemapFaces[chosenEnvironment]);
+    }
 
     if (state[SDL_SCANCODE_TAB]) {
         SDL_Delay(250); // This is hacky in the name of simplicity,
@@ -1023,8 +1064,8 @@ void MainLoop(){
     // Useful for handling 'mouselook'
     // This works because we effectively 're-center' our mouse at the start
     // of every frame prior to detecting any mouse motion.
-    SDL_WarpMouseInWindow(gGraphicsApplicationWindow,gScreenWidth/2,gScreenHeight/2);
-    SDL_SetRelativeMouseMode(SDL_TRUE);
+    //SDL_WarpMouseInWindow(gGraphicsApplicationWindow,gScreenWidth/2,gScreenHeight/2);
+    //SDL_SetRelativeMouseMode(SDL_TRUE);
 
 
 	// While application is running
@@ -1082,7 +1123,6 @@ void CleanUp(){
 */
 int main( int argc, char* args[] ){
     std::cout << "Use w and s keys to move forward and back\n";
-    std::cout << "Use up and down to change tessellation\n";
     std::cout << "Use tab to toggle wireframe\n";
     std::cout << "Press ESC to quit\n";
 

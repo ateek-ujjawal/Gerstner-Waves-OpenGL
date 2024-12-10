@@ -4,15 +4,13 @@
 // what our shader reads, the first part of the
 // graphics pipeline.
 layout(location=0) in vec3 position;
-layout(location=1) in vec2 texCoords;
-layout(location=2) in vec3 vertexNormals;
+layout(location=1) in vec3 vertexNormals;
 
 // Uniform variables
 uniform mat4 u_ModelMatrix;
 
 out VertexData {
     vec3 v_vertexPosition;
-    vec2 v_texCoords;
     vec3 v_vertexNormals;
 } v_out;
 
@@ -22,7 +20,6 @@ void main()
   vec4 world_pos = u_ModelMatrix * vec4(position, 1.0);
 
   v_out.v_vertexPosition = world_pos.xyz;
-  v_out.v_texCoords = texCoords;
   v_out.v_vertexNormals = world_normal.xyz;
 
   //v_vertexColors = vertexColors;
