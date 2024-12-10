@@ -2,7 +2,7 @@
 
 ## Title: 
 
-**Edit this line -- Put your 'title' of your project here**
+**Wave simulation using gerstner waves and refractive mapping using a skybox**
 
 ## YouTube/Dropbox/Drive Link: 
 
@@ -10,19 +10,24 @@
 
 ## Screenshots
 
-**Edit this line Put a few screenshots of your project here (see deliverables).**
+**![Screenshot 2024-12-09 142608](https://github.com/user-attachments/assets/2892c1ea-ab0d-4f07-8d08-80e640426a40)**
+
+**![Screenshot 2024-12-09 201249](https://github.com/user-attachments/assets/5442f5ac-9dac-41ad-b476-9a8357c6866f)**
+
+**![Screenshot 2024-12-09 201316](https://github.com/user-attachments/assets/f32dac8c-285b-47eb-a556-0a0af67c5d0d)**
+
 
 
 * Name and partners name(At most teams of 2 folks total)
-  * Team member 1: *edit this*
+  * Team member 1: *Ateek Ujjawal*
   * Team member 2: *edit this*
-* How many hours did it take you to complete this final project? 
-* Did you collaborate or share ideas with any other students/TAs/Professors?
+* How many hours did it take you to complete this final project? **20-30 hours**
+* Did you collaborate or share ideas with any other students/TAs/Professors? **Requested some video guidance on gerstner waves from the professor**
 * Did you use any external resources? 
   * Note it is fair to utilize some tutorials--cite them here. You **must** add your own personal touch however!
-  * *edit this*
-  * *edit this*
-  * *edit this*
+  * *LearnOpenGL*
+  * *NVidia GPU Gems paper on Effective Water simulation from physical models*
+  * *OGLDev for understanding tessellation shaders*
   * (Optional) What was the most interesting part of the Final Assignment? How could the instructor improve the final project?
 
 ### Rubric
