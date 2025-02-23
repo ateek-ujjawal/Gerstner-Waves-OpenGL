@@ -1,70 +1,180 @@
-*TODO*: Please edit the following information in your final project
+# Final Project - Computer Graphics
 
-## Title: 
+<img src="./media/header.jpg">
 
-**Wave simulation using gerstner waves and refractive mapping using a skybox**
+## Description
 
-## YouTube/Dropbox/Drive Link: 
+An important part of any computer graphics course, in my opinion, is having the opportunity to build a project that you care about. The final project in this course showcases your creativity from what you have learned over the semester and can be used as a portfolio piece for future internship, co-op, and full-time job opportunities.  We have covered enough computer graphics now that you are ready to design and create a project from scratch.
+  
+## Expectations
 
-**Edit this line -- Put your link to your video(Preferably on YouTube) here (see deliverables)**
+You can work on any idea you want that is within the scope of graphics APIs we have covered (e.g. OpenGL + C++). You may explore areas that we did not cover heavily in class (Animation, particles, different rendering techniques, advanced shaders, image processing, volume rendering, etc.).  Your final project should be on the order of the difficulty beyond the homeworks.  
 
-## Screenshots
+## Banned Project Ideas and Guidance (You cannot or otherwise are strongly advised against these ideas)
 
-**![Screenshot 2024-12-09 142608](https://github.com/user-attachments/assets/2892c1ea-ab0d-4f07-8d08-80e640426a40)**
+1. Solar Systems based off of previous Assignments
+	- Sorry, I've seen WAY too many, and they tend to underperform as portfolio pieces.
+		- (most folks just add more planets which is not enough effort for a final project).
+		- A final project should be at least the equivalent effort of an assignment if not more.
+2. Pong
+	- You have to understand, the bar is not high for implementing the game pong.
+	- There is no creativity in this project, employers will not be impressed if this is on your portfolio, it's just not the right thing to implement. 
+	- Pong is great for learning, useful for understanding how to structure a game, but just not a final project after a semester of computer graphics.
+3. Post processing with lots of trivial kernels
+	- I've seen it too often that folks copy previous code and just take the kernels and change them. This is not a deep enough project. You have to create a new kernel, perform image stiching, or do something that is not trivial.
+4. Again, **you cannot use a game engine or framework** like Unity3D, Unreal Engine, Godot, pygame, three.js, phaser.js, OGRE, etc. for your project.
+	- You must use a low-level graphics API (OpenGL, Vulkan, Metal, WebGL).
+		- **You cannot just use SDL2** -- you need to use a low-level graphics API (e.g. OpenGL, maybe Vulkan if instructor approved)
+	- Some further guidance:
+			- In years past folks have completely avoided OpenGL and just used SDL2 for their project, that is essentially avoiding the spirit of a computer graphics project using OpenGL which we have been learning all semester.
+		- If you're not using shaders anywhere in your project, that's probably a red flag, and you need to come talk to me about what you are planning for your project.
+5. Again, **You cannot**  use pygame and pyopengl and do some random project without talking to me first.
+6. Again, **You cannot**  use threejs and javascript and do some project without talking to me first.
+7. You cannot use other graphics APIS
+   	- I'm **Banning all other graphics APIs this term other than the one we use in this class**. Why? Too much copy & paste and occassional cases of plagerism.
+   	- Sorry -- I can't evaluate every different APIs with equity.
 
-**![Screenshot 2024-12-09 201249](https://github.com/user-attachments/assets/5442f5ac-9dac-41ad-b476-9a8357c6866f)**
+Make sure you read the above clearly and talk to me or a TA if you have any concern about your project tool stack. C++ and OpenGL like we've been doing for the assignments if fine.
 
-**![Screenshot 2024-12-09 201316](https://github.com/user-attachments/assets/f32dac8c-285b-47eb-a556-0a0af67c5d0d)**
+**Anything outside that toolstack (C++, OpenGL, and SDL) needs explicit approval.**
+
+## Dependencies
+
+- You should not introduce dependencies (e.g. libraries such as: glfw, stb_image, etc.) without getting them approved first.
+	- I understand many tutorials use glfw, glew, etc. instead of SDL -- but we have been using SDL all semester, so that is my expectation unless you otherwise have a good expectation.
+ 	- Often times when I see glfw in a project, that tells me you did not understand the purpose of SDL in the first place (which is to merely setup OpenGL context, create a window, and handle input).
+    	- Thus -- **glfw** is an example dependency that is **not allowed** unless you otherwise provide a justification for it.
+
+## Assignment strategy
+
+My suggested strategy for this project is to:
+
+* You will have plenty of time to think about the project you want to deliver, but get started early.
+* I recommend finding at least one web tutorial, youtube talk, etc. that can serve as a reference for you to fall back on.
+* You can get feedback from me ahead of time on nearly any graphics related topic, do so!
+* Find your teammates(teams of up to 2) early if you choose to work in a team!
+  * Piazza is a good resource, and I will tentatively match folks on a spreadsheet if requested.
+  
+## How to run your final project
+
+Use a [build.py](./build.py). You can modify [build.py](./build.py) to your needs, but I should be able to type `python3 build.py` and then run the generated executable. I plan to spend 0 time figuring out what dependencies to download. If there is some setup extraneous setup needed to run your project, we should arrange to demonstrate your project during office hours. 
+
+Pretend you are deploying this software to someone who has no idea what your code does and needs to be able to run it. The only assumption you should make is the user has SDL2 setup and perhaps a web browser. Logistically, using the [build.py](./build.py) that we have used in this course makes it possible for myself and the course staff to run and debug your project.
+
+## Video Deliverable
+
+For this project, you need to make a video recording of your project. Here are the specifications:
+
+- Give an 2-3 minute overview of your implementation as a youtube video.
+- Explain what your project is (i.e. You should be talking in your video as you show things)
+- Show what was achieved (e.g. moving a camera around and talking over) 
+- In the video highlight **one** particular technical achievement.
+  - e.g. Part of the code or algorithm that does something neat or was difficult to get right.
+    - Give a quick 'tutorial' like summary of how you solved the problem.
+    - You can talk about other important features in your project, but dedicate some time on one specific item.
+    
+Videos may publicly be uploaded to the course websites 'hall of fame'--please keep the links up!
+
+### Sample Video Deliverable
+
+Here are some samples from previous years and what I like about it:
+
+- [Terrain](https://youtu.be/cGB8C6IT8eE)
+  - I like this sample because:
+    - I can hear the speakers voice.
+    - The talk is well outlined and concise.
+    - The speaker shows off the technical parts of the code well.
+    - The speaker shows the actual visuals and uses a high resolution video.
+    - It is not a very long video with lots of silence or 'umms'
+    - If I were to see this on a resume, I would have a very good idea of what the developer knows.
+- (Summer 20) [Breakout](https://www.youtube.com/watch?v=IV4EvMX9Lw8&feature=youtu.be): 
+  - I like this sample because:
+    - I can again hear the speakers voice very clearly.
+    - There are additions beyond what the tutorial provides showing creativity, and pushing the envelope.
+    - The presentations highlights very clearly the graphics effects being talked about.
+    - The technical portions are broken into small pieces, thus making it possible for someone to learn from. They are teaching as they are presenting their project which is absolutely wonderful.
+ - (Fall 20) [Deferred Rendering](https://www.youtube.com/watch?v=S-fF5R1jeBc): 
+   - I like this project because this student took a large risk in the implementation.
+     - They did a great implementation and conveyed their passion.
+     - They conveyed enough passion throughout the entire semester, did something very difficult, that I forgave them for having a very loud fan in their video.
+       - They should probably do another recording for their portfolio however.
+        - They spent most of the video 'teaching' so I forgave them for going over the recommended 3 minute limit.
+- (Fall 20) [3D Sine Wave Visualier](https://www.youtube.com/watch?v=Cu3k_METjzA): 
+    - Excellent job teaching in this presentation.
+    - May have liked to see the visualization earlier to *sell me* as a viewer, but otherwise speaker did a great and clear presentation.
+- (Fall 21) [Surface Simplification](https://www.youtube.com/watch?v=qfl6fkYbPXU): 
+	- This project implements an actual SIGGRAPH paper.
+	- Well presented, and shows off the actual 3D object going simplification as speaker speaks.
+	- Breaks down complicated technical idea (from a paper) to something consumable.
 
 
+## Deliverables
 
-* Name and partners name(At most teams of 2 folks total)
-  * Team member 1: *Ateek Ujjawal*
-  * Team member 2: *edit this*
-* How many hours did it take you to complete this final project? **20-30 hours**
-* Did you collaborate or share ideas with any other students/TAs/Professors? **Requested some video guidance on gerstner waves from the professor**
-* Did you use any external resources? 
-  * Note it is fair to utilize some tutorials--cite them here. You **must** add your own personal touch however!
-  * *LearnOpenGL*
-  * *NVidia GPU Gems paper on Effective Water simulation from physical models*
-  * *OGLDev for understanding tessellation shaders*
-  * (Optional) What was the most interesting part of the Final Assignment? How could the instructor improve the final project?
+* You need to commit your code to this repository.
+* Your program needs to compile using a build.py script (Unless it is an instructor approved webgl project).
+* Put a link to a youtube/Vimeo video in this README.md.
+* Put screenshots in the [../README.md](../README.md) along with the youtube/vimeo video.
 
-### Rubric
+## More Resources
 
-**Make sure you read the banned project ideas/APIs in the Readme**
+* N/A
 
-<table>
-  <tbody>
-    <tr>
-      <th>Points</th>
-      <th align="center">Description</th>
-    </tr>
-    <tr>
-      <td>(5%) Project Check-in</td>
-     <td align="left">Did you check-in with the professor or TA during office hours regarding your project at least 2 weeks before the deadline?</td>
-    </tr>
-  </tbody>
-</table>
+## Other FAQ
 
+- Q: May I upload my final project to a public repository after the semester is over?
+	- A: Yes under the following conditions
+		- You acknowledge your team members and any third parties fairly for their contributions.
+  		- You remove the README.md provided with the assignment (delete it entirely from your github history), as you'll want your own readme anyway.
+- Q: May I have a team of 3 or 4--I really want 3 or 4 team members?
+	- A: No. I recommend a team size of 1-2. This project can be completed as a 1 person project.
+ 	- I **strongly** recommend using this project as a portfolio piece and treating it as such if you were to apply for a software or graphics engineering position.
+- Q: Can I use any of the lab/support code in my project?
+	- A: Yes, anything that I've provided you can use.
+ 	- Please acknowledge me somewhere in the repo, and if you use this project in your portfolio, please keep that acknowledgement in if there was significant use of code I have provided.
+- Q: Can I use late day tokens on the final project?
+	- A: No, unfortunately the final project deadline is the same for everyone for both fairness, as well as the more pragmatic grading deadline that looms at the end of the semester.
+- Q: Can I have an extension?
+	- A: No (see above). The project is released well ahead of time for you to plan.
+ 	- Do not procrastinate and try to finish the project the weekend before the deadline. 
+	
+	
+### Even more Project Ideas
 
-<table>
-  <tbody>
-    <tr>
-      <th>Points</th>
-      <th align="center">Description</th>
-    </tr>
-    <tr>
-      <td>(25%) Project Completion</td>
-     <td align="left"><ul><li>(10%) Does the project compile and run.</li><li>Is it polished without any bugs (No weird visual artifacts).</li><li>(15%)Did you make a video (ideally 2-3 minutes in length following guidelines given in writeup: introduce your project, show your project, show something technical in code that you can explain.)?</li><li>(5%)Did you add a screenshot of your project to the repository?</li></ul></td>
-    </tr>
-    <tr>
-      <td>(40%) Technical</td>
-      <td align="left"><ul><li>Was the implementation of the project challenging?</li><li>Even if you followed a tutoral, it should not be trivial, and have some personal touch to it.</li><li>Did you have to organize/process a sufficient amount of data?</li><li>Was it clear you consulted some outside resources that go above and beyond the scope of this class</li></ul></td>
-    </tr>
-    <tr>
-      <td>(30%) Creativity</td>
-      <td align="left"><ul><li>How visually appealing is the scene?<ul><li>Note: There should be some 'wow' factor--instructors discretion is used here relative to previous projects.</li></ul></li><li>How original is the project<ul><li>Again, did you enhance a tutorial and do something unique or just go by the book?</li></ul></li></ul></td>
-    </tr>
-  </tbody>
-</table>
+## Project Ideas
+
+I am going to list a few project ideas that I think are within the scope of this class.
+
+* Procedural generation
+  * Terrain rendering [https://www.youtube.com/watch?v=QjTPIbJNO6I]
+  * City [https://www.youtube.com/watch?v=-d2-PtK4F6Y]
+  * Continuous LOD [https://www.youtube.com/watch?v=DUxAyfuJULc]
+* Rendering 
+  * Photon maps [https://www.youtube.com/watch?v=GckOkpeJ3BY]
+  * Radiosity [https://www.youtube.com/watch?v=8i2M255Zw9I]
+* Constructive Solid Geometry
+  * [https://www.youtube.com/watch?v=-nWPZgxYW-k]
+* Build out or extend ray tracer(Our final homework in some iterations of the course): [https://www.youtube.com/watch?v=ijqaBhyXN98]
+  * Depth of field
+  * Motion blur
+* Modeling
+  * Progressive Mesh https://www.youtube.com/watch?v=CcomX9UQO1w
+  * Subdivision of surfaces [https://www.youtube.com/watch?v=g1M2y1bZOPw]
+  * Or the opposite decimation (mesh simplification) [https://www.youtube.com/watch?v=AvSgHhA9yP4]
+  * Deformable mesh [https://www.youtube.com/watch?v=r_rkSi8VZj0]
+* Volume rendering
+  * Example [https://www.youtube.com/watch?v=nmdlGlJ-2G0]
+* Animation
+  * Flocking behavior [https://www.youtube.com/watch?v=1svKGmGCdXk]
+  * Inverse kinematics [https://www.youtube.com/watch?v=uN_pR9fH-WY]
+  * Physics-based simulation (e.g. pinball)
+  * Collision detection [https://www.youtube.com/watch?v=ZU5PKXxTv8k]
+* Particle Simulation [https://www.youtube.com/watch?v=RMfsdUKEmDo]
+* Games
+  * Build a little First person perspective(shooter, advenutre, etc.) or other interactive environment
+  * Racing game [https://www.youtube.com/watch?v=SVzFWnadOdY]
+* Shaders
+  * Create a world with many different shaders
+    * Cel / Toon shaders [https://www.youtube.com/watch?v=RWTQuvXm2HU]
+    * Bump / Normal / Parallax / Relief mapping [Example]
+  * Deferred rendering [https://www.youtube.com/watch?v=HIrq4sF5QO8]
+
